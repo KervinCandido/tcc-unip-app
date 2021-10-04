@@ -1,4 +1,4 @@
-package com.example.app_tcc_unip
+package br.unip.cc.tccunip
 
 import io.flutter.embedding.android.FlutterActivity
 
