@@ -9,15 +9,17 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  cupertino_icons: ^1.0.2
-  firebase_core: ^1.7.0
-  firebase_auth: ^3.1.2
+  flutter_localizations:
+    sdk: flutter
   flutter_spinkit: ^5.1.0
   http: ^0.13.3
   flutter_dotenv: ^5.0.2
   shared_preferences: ^2.0.7
   jwt_decoder: ^2.0.1
+  intl: ^0.17.0
+  community_material_icon: ^5.9.55
+  image_picker: ^0.8.4+1
+  sqflite: ^2.0.0+4
 
 dev_dependencies:
   flutter_test:

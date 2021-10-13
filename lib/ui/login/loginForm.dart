@@ -1,5 +1,6 @@
 import 'package:app_tcc_unip/controller/authController.dart';
 import 'package:app_tcc_unip/controller/form/authForm.dart';
+import 'package:app_tcc_unip/ui/main/mainScreen.dart';
 import 'package:app_tcc_unip/ui/screens/categories_screen.dart';
 import 'package:app_tcc_unip/ui/signUp/signUpScreen.dart';
 import 'package:app_tcc_unip/ui/util/loading.dart';
@@ -197,7 +198,7 @@ class _LoginFormState extends State<LoginForm> {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (_) {
-              return CategoriesScreen();
+              return MainScreen();
             },
           ),
         );

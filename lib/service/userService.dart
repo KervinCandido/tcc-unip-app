@@ -7,6 +7,6 @@ class UserService {
   Future<int> getUserId() async {
     var token = await tokenService.getToken();
     var decodedToken = JwtDecoder.decode(token!);
-    return decodedToken['sub'];
+    return int.tryParse(decodedToken['sub']) ?? 0;
   }
 }

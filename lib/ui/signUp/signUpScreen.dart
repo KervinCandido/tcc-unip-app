@@ -4,6 +4,7 @@ import 'package:app_tcc_unip/controller/form/authForm.dart';
 import 'package:app_tcc_unip/controller/form/signForm.dart';
 import 'package:app_tcc_unip/controller/signUpController.dart';
 import 'package:app_tcc_unip/ui/login/loginScreen.dart';
+import 'package:app_tcc_unip/ui/main/mainScreen.dart';
 import 'package:app_tcc_unip/ui/screens/categories_screen.dart';
 import 'package:app_tcc_unip/ui/util/loading.dart';
 import 'package:app_tcc_unip/ui/validator/emailValidation.dart';
@@ -247,7 +248,7 @@ class _SignUpState extends State<SignUp> {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (_) {
-                return CategoriesScreen();
+                return MainScreen();
               },
             ),
           );

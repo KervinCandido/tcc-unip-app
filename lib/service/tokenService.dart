@@ -21,6 +21,11 @@ class TokenService {
     return prefs.getString(token);
   }
 
+  Future<String?> getTokenForResquest() async {
+    var token = await getToken();
+    return token == null ? null : 'Bearer $token';
+  }
+
   Future<bool> removeToken() async {
     final prefs = await _prefs;
     return prefs.remove(token);
