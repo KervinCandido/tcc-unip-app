@@ -20,6 +20,7 @@ dependencies:
   community_material_icon: ^5.9.55
   image_picker: ^0.8.4+1
   sqflite: ^2.0.0+4
+  flutter_chat_bubble: ^2.0.0
 
 dev_dependencies:
   flutter_test:

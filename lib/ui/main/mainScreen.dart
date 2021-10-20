@@ -1,3 +1,4 @@
+import 'package:app_tcc_unip/ui/main/contact-list/contact-list.dart';
 import 'package:app_tcc_unip/ui/main/profile/profile.dart';
 import 'package:flutter/material.dart';
 
@@ -31,7 +32,7 @@ class MainScreen extends StatelessWidget {
         body: TabBarView(
           children: [
             Profile(),
-            Icon(Icons.directions_transit),
+            ContactList(),
             Icon(Icons.directions_bike),
             Icon(Icons.directions_boat),
           ],
