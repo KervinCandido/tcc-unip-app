@@ -1,13 +1,17 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:app_tcc_unip/controller/dto/erroFormDTO.dart';
 import 'package:app_tcc_unip/controller/dto/profileDTO.dart';
 import 'package:app_tcc_unip/controller/exception/ErroFormException.dart';
 import 'package:app_tcc_unip/controller/form/profileForm.dart';
+import 'package:app_tcc_unip/dao/profileDAO.dart';
+import 'package:app_tcc_unip/model/profile.dart';
 import 'package:app_tcc_unip/service/tokenService.dart';
 import 'package:app_tcc_unip/service/userService.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 const BASE_URL_API = 'BASE_URL_API';
 
@@ -15,14 +19,21 @@ class ProfileService {
   final String baseURL = dotenv.get(BASE_URL_API);
   final _userService = UserService();
   final _tokenService = TokenService();
+  final _profileDAO = ProfileDAO();
 
   ProfileService() {
     print('criando profileService');
   }
 
   Future<ProfileDTO?> getProfileCurrentUser() async {
-    print('buscando id do usuário');
     int userId = await _userService.getUserId();
+    Profile? profile = await _profileDAO.profileByUserId(userId);
+
+    if (profile != null) {
+      return ProfileDTO.fromProfile(profile);
+    }
+
+    print('buscando id do usuário');
     var token = await _tokenService.getTokenForResquest();
     final response = await http.get(
       Uri.parse('$baseURL/profile/user/id/$userId'),
@@ -41,8 +52,27 @@ class ProfileService {
 
   Future<ProfileDTO> create(ProfileForm profileForm) async {
     var token = await _tokenService.getTokenForResquest();
-    print(jsonEncode(profileForm));
-    print('$token');
+
+    if (profileForm.photo != null) {
+      final directory = await getApplicationDocumentsDirectory();
+      final path = directory.path;
+      final photo = profileForm.photo!;
+      var split = photo.split("\.");
+      var extension = '.${split[split.length - 1]}';
+      final photoFile = File(photo);
+
+      await Directory('$path/.tccunip/profile/').create(recursive: true);
+
+      var newFile =
+          File('$path/.tccunip/profile/${profileForm.userId}$extension');
+      await newFile.delete();
+
+      final newDirectory = await photoFile.copy(newFile.path);
+      profileForm.photo = newDirectory.path;
+
+      await photoFile.delete();
+    }
+
     final response = await http.post(
       Uri.parse('$baseURL/profile'),
       body: jsonEncode(profileForm),
@@ -55,7 +85,11 @@ class ProfileService {
     );
 
     if (response.statusCode == 201) {
-      return ProfileDTO.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+      var profileDTO =
+          ProfileDTO.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+
+      await _profileDAO.insertOrUpdate(profileDTO.toProfile());
+      return profileDTO;
     } else if (response.statusCode == 400) {
       Iterable it = jsonDecode(utf8.decode(response.bodyBytes));
       List<ErroFormDTO> errosFormDTO = List<ErroFormDTO>.from(

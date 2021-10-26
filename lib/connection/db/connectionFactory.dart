@@ -12,15 +12,26 @@ class ConnectionFactory {
     return _instance;
   }
 
-  // Future<Database> get connection async {
-  //   return openDatabase(
-  //     join(await getDatabasesPath(), DB_NAME),
-  //     onCreate: (db, version) {
-  //       return db.execute(
-  //         '''CREATE TABLE ();''',
-  //       );
-  //     },
-  //     version: 1,
-  //   );
-  // }
+  Future<Database> get connection async {
+    return openDatabase(
+      join(await getDatabasesPath(), DB_NAME),
+      onCreate: (db, version) async {
+        await db.execute('''CREATE TABLE IF NOT EXISTS setting(
+            KEY TEXT PRIMARY KEY,
+            VALUE TEXT
+          ) WITHOUT ROWID;''');
+        await db.execute(
+          '''CREATE TABLE IF NOT EXISTS profile(
+            USER_ID INTEGER PRIMARY KEY,
+            PROFILE_NAME TEXT NOT NULL,
+            BIRTH_DATE TEXT NOT NULL,
+            GENDER TEXT NOT NULL,
+            PHOTO TEXT,
+            DESCRIPTION TEXT
+          );''',
+        );
+      },
+      version: 1,
+    );
+  }
 }

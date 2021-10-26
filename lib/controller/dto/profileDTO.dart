@@ -1,3 +1,4 @@
+import 'package:app_tcc_unip/model/profile.dart';
 import 'package:intl/intl.dart';
 
 class ProfileDTO {
@@ -45,5 +46,28 @@ class ProfileDTO {
       photo: $photo,
       description: $description
     }''';
+  }
+
+  Profile toProfile() {
+    return Profile(
+      userId,
+      profileName,
+      birthDate,
+      gender,
+      photo,
+      description,
+    );
+  }
+
+  factory ProfileDTO.fromProfile(Profile profile) {
+    return ProfileDTO(
+      id: 0,
+      userId: profile.userId,
+      profileName: profile.profileName,
+      birthDate: profile.birthDate,
+      gender: profile.gender,
+      photo: profile.photo,
+      description: profile.description,
+    );
   }
 }

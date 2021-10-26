@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:app_tcc_unip/controller/dto/profileDTO.dart';
 import 'package:app_tcc_unip/ui/main/profile/editableProfile.dart';
 import 'package:community_material_icon/community_material_icon.dart';
@@ -36,7 +37,7 @@ class _ViewProfileState extends State<ViewProfile> {
                   child: CircleAvatar(
                     backgroundImage: this.profile.photo == null
                         ? null
-                        : Image.memory(base64Decode(this.profile.photo!)).image,
+                        : Image.file(File(this.profile.photo!)).image,
                   ),
                 ),
               ),
@@ -135,10 +136,9 @@ class _ViewProfileState extends State<ViewProfile> {
             ),
           );
 
+          if (result == null) return;
           setState(() {
-            if (result != null) {
-              profile = result;
-            }
+            profile = result;
           });
         },
         child: const Icon(Icons.edit),

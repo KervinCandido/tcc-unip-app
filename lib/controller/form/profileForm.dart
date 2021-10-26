@@ -1,3 +1,4 @@
+import 'package:app_tcc_unip/model/profile.dart';
 import 'package:intl/intl.dart';
 
 class ProfileForm {
@@ -5,7 +6,7 @@ class ProfileForm {
   final String profileName;
   final DateTime birthDate;
   final String gender;
-  final String? photo;
+  String? photo;
   final String? description;
 
   ProfileForm(this.userId, this.profileName, this.birthDate, this.gender,
@@ -20,5 +21,16 @@ class ProfileForm {
       'photo': photo == null ? null : photo,
       'description': description == null ? null : description
     };
+  }
+
+  Profile toProfile() {
+    return Profile(
+      userId,
+      profileName,
+      birthDate,
+      gender,
+      photo,
+      description,
+    );
   }
 }
