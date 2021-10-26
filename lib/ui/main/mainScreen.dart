@@ -1,5 +1,8 @@
 import 'package:app_tcc_unip/connection/websocket/websocketController.dart';
 import 'package:app_tcc_unip/model/contactRecommendation.dart';
+import 'package:app_tcc_unip/service/authService.dart';
+import 'package:app_tcc_unip/service/tokenService.dart';
+import 'package:app_tcc_unip/ui/login/loginScreen.dart';
 import 'package:app_tcc_unip/ui/main/contact-list/contact-list.dart';
 import 'package:app_tcc_unip/ui/main/contact-recommendation/viewContactRecommendation.dart';
 import 'package:app_tcc_unip/ui/main/notification/notification-list.dart';
@@ -49,9 +52,24 @@ class _MainScreenState extends State<MainScreen> {
         appBar: AppBar(
           title: Text('Mewple'),
           actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: Icon(Icons.more_vert),
+            new PopupMenuButton<int>(
+              itemBuilder: (BuildContext context) => <PopupMenuItem<int>>[
+                new PopupMenuItem<int>(
+                  value: 1,
+                  child: new Text('Sair'),
+                ),
+              ],
+              onSelected: (int value) async {
+                await TokenService().removeToken();
+                await AuthService().disableAutoLogin();
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (_) {
+                      return Login();
+                    },
+                  ),
+                );
+              },
             ),
           ],
           bottom: TabBar(

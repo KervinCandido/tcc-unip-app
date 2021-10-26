@@ -50,4 +50,10 @@ class AuthService {
     }
     return this.auth(AuthForm(userName: userName, password: password));
   }
+
+  Future<void> disableAutoLogin() async {
+    final prefs = await _prefs;
+    prefs.remove(USER_NAME_KEY);
+    prefs.remove(PASSOWORD_KEY);
+  }
 }
