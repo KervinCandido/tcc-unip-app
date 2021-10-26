@@ -101,7 +101,11 @@ class _EditableProfileState extends State<EditableProfile> {
                                 height: 120,
                                 child: CircleAvatar(
                                   backgroundImage: _photo != null
-                                      ? Image.memory(_photo!).image
+                                      ? Image.memory(
+                                          _photo!,
+                                          width: 120,
+                                          height: 120,
+                                        ).image
                                       : null,
                                 ),
                               ),
@@ -117,15 +121,71 @@ class _EditableProfileState extends State<EditableProfile> {
                                     ),
                                   ),
                                   onTap: () async {
-                                    print('TAP');
-                                    var picture = await ImagePicker()
-                                        .pickImage(source: ImageSource.camera);
-                                    setState(() {
-                                      print(picture!.path);
-                                      picture
-                                          .readAsBytes()
-                                          .then((value) => _photo = value);
-                                    });
+                                    showDialog(
+                                      barrierDismissible: false,
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return SimpleDialog(
+                                          contentPadding:
+                                              const EdgeInsets.all(0),
+                                          children: [
+                                            SimpleDialogOption(
+                                              child: Text('Galeria'),
+                                              padding: EdgeInsets.only(
+                                                top: 16,
+                                                left: 16,
+                                                bottom: 12,
+                                                right: 8,
+                                              ),
+                                              onPressed: () async {
+                                                var picture =
+                                                    await ImagePicker()
+                                                        .pickImage(
+                                                            source: ImageSource
+                                                                .gallery);
+                                                if (picture == null) {
+                                                  Navigator.pop(context);
+                                                  return;
+                                                }
+
+                                                setState(() {
+                                                  picture.readAsBytes().then(
+                                                      (value) =>
+                                                          _photo = value);
+                                                });
+                                                Navigator.pop(context);
+                                              },
+                                            ),
+                                            SimpleDialogOption(
+                                                child: Text('Câmera'),
+                                                padding: EdgeInsets.only(
+                                                  top: 12,
+                                                  left: 16,
+                                                  bottom: 16,
+                                                  right: 8,
+                                                ),
+                                                onPressed: () async {
+                                                  var picture =
+                                                      await ImagePicker()
+                                                          .pickImage(
+                                                              source:
+                                                                  ImageSource
+                                                                      .camera);
+                                                  if (picture == null) {
+                                                    Navigator.pop(context);
+                                                    return;
+                                                  }
+                                                  setState(() {
+                                                    picture.readAsBytes().then(
+                                                        (value) =>
+                                                            _photo = value);
+                                                  });
+                                                  Navigator.pop(context);
+                                                }),
+                                          ],
+                                        );
+                                      },
+                                    );
                                   },
                                 ),
                               ),
