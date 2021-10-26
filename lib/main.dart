@@ -1,5 +1,4 @@
 import 'package:app_tcc_unip/controller/authController.dart';
-import 'package:app_tcc_unip/service/authService.dart';
 import 'package:app_tcc_unip/ui/main/mainScreen.dart';
 import 'package:app_tcc_unip/ui/signUp/signUpScreen.dart';
 import 'package:flutter/material.dart';
@@ -34,18 +33,22 @@ void main() async {
             ),
       ),
       home: FutureBuilder<bool>(
-          future: _authController.autoAuth(),
-          builder: (
-            BuildContext context,
-            AsyncSnapshot<bool> snapshot,
-          ) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return (snapshot.data ?? false) ? MainScreen() : SignUp();
-            }
-            return SpinKitSpinningLines(
+        future: _authController.autoAuth(),
+        builder: (
+          BuildContext context,
+          AsyncSnapshot<bool> snapshot,
+        ) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return (snapshot.data ?? false) ? MainScreen() : SignUp();
+          }
+          return Container(
+            color: Colors.white,
+            child: SpinKitSpinningLines(
               color: Colors.redAccent,
-            );
-          }),
+            ),
+          );
+        },
+      ),
     ),
   );
 }

@@ -1,8 +1,8 @@
-class Message {
+class MessageChat {
   final String text;
   final MessageType type;
 
-  Message(this.text, this.type);
+  MessageChat(this.text, this.type);
 
   @override
   String toString() {

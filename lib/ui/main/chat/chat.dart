@@ -1,25 +1,20 @@
 import 'dart:convert';
 
+import 'package:app_tcc_unip/connection/websocket/websocketController.dart';
 import 'package:app_tcc_unip/model/contact.dart';
-import 'package:app_tcc_unip/ui/main/chat/message.dart';
+import 'package:app_tcc_unip/model/contactRecommendation.dart';
+import 'package:app_tcc_unip/model/message.dart';
+import 'package:app_tcc_unip/service/tokenService.dart';
+import 'package:app_tcc_unip/ui/main/chat/messageChat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 import 'package:flutter_chat_bubble/bubble_type.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_1.dart';
-import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_10.dart';
-import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_2.dart';
-import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_3.dart';
-import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_4.dart';
-import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_5.dart';
-import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_6.dart';
-import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_7.dart';
-import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_8.dart';
-import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_9.dart';
 
 class Chat extends StatefulWidget {
-  final Contact contact;
+  final ContactRecommendation contact;
 
   const Chat(this.contact, {Key? key}) : super(key: key);
 
@@ -28,41 +23,57 @@ class Chat extends StatefulWidget {
 }
 
 class _ChatState extends State<Chat> {
-  final Contact contact;
+  final ContactRecommendation contact;
 
-  final List<Message> _messagems = [
-    Message("olá", MessageType.SEND),
-    Message("oi, tudo bem ?", MessageType.RECEIVER),
-    Message("olá", MessageType.SEND),
-    Message("oi, tudo bem ?", MessageType.RECEIVER),
-    Message("olá", MessageType.SEND),
-    Message("oi, tudo bem ?", MessageType.RECEIVER),
-    Message("olá", MessageType.SEND),
-    Message("oi, tudo bem ?", MessageType.RECEIVER),
-    Message("olá", MessageType.SEND),
-    Message("oi, tudo bem ?", MessageType.RECEIVER),
-    Message("olá", MessageType.SEND),
-    Message("oi, tudo bem ?", MessageType.RECEIVER),
-    Message("olá", MessageType.SEND),
-    Message("oi, tudo bem ?", MessageType.RECEIVER),
-    Message("olá", MessageType.SEND),
-    Message("oi, tudo bem ?", MessageType.RECEIVER),
-    Message("olá", MessageType.SEND),
-    Message("oi, tudo bem ?", MessageType.RECEIVER),
-    Message("olá", MessageType.SEND),
-    Message("oi, tudo bem ?", MessageType.RECEIVER),
-    Message("olá", MessageType.SEND),
-    Message("oi, tudo bem ?", MessageType.RECEIVER),
-    Message("olá", MessageType.SEND),
-    Message("oi, tudo bem ?", MessageType.RECEIVER),
-    Message("não", MessageType.SEND),
-    Message("..........", MessageType.RECEIVER),
+  final List<MessageChat> _messagems = [
+    // Message("olá", MessageType.SEND),
+    // Message("oi, tudo bem ?", MessageType.RECEIVER),
+    // Message("olá", MessageType.SEND),
+    // Message("oi, tudo bem ?", MessageType.RECEIVER),
+    // Message("olá", MessageType.SEND),
+    // Message("oi, tudo bem ?", MessageType.RECEIVER),
+    // Message("olá", MessageType.SEND),
+    // Message("oi, tudo bem ?", MessageType.RECEIVER),
+    // Message("olá", MessageType.SEND),
+    // Message("oi, tudo bem ?", MessageType.RECEIVER),
+    // Message("olá", MessageType.SEND),
+    // Message("oi, tudo bem ?", MessageType.RECEIVER),
+    // Message("olá", MessageType.SEND),
+    // Message("oi, tudo bem ?", MessageType.RECEIVER),
+    // Message("olá", MessageType.SEND),
+    // Message("oi, tudo bem ?", MessageType.RECEIVER),
+    // Message("olá", MessageType.SEND),
+    // Message("oi, tudo bem ?", MessageType.RECEIVER),
+    // Message("olá", MessageType.SEND),
+    // Message("oi, tudo bem ?", MessageType.RECEIVER),
+    // Message("olá", MessageType.SEND),
+    // Message("oi, tudo bem ?", MessageType.RECEIVER),
+    // Message("olá", MessageType.SEND),
+    // Message("oi, tudo bem ?", MessageType.RECEIVER),
+    // Message("não", MessageType.SEND),
+    // Message("..........", MessageType.RECEIVER),
   ];
 
   final _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  _ChatState(this.contact);
+  _ChatState(this.contact) {
+    _webSocketController.addMessageListener(onMessage);
+  }
+
+  @override
+  void dispose() {
+    _webSocketController.removeMessageListener(onMessage);
+    super.dispose();
+  }
+
+  onMessage(Message message) {
+    setState(() {
+      _messagems.add(MessageChat(message.content, MessageType.RECEIVER));
+    });
+  }
+
+  final _webSocketController = WebsocketController.getInstance();
 
   @override
   Widget build(BuildContext context) {
@@ -78,9 +89,10 @@ class _ChatState extends State<Chat> {
           children: [
             CircleAvatar(
               minRadius: 20,
-              backgroundImage: this.contact.photo == null
+              backgroundImage: this.contact.photoProfile == null
                   ? null
-                  : Image.memory(base64Decode(this.contact.photo!)).image,
+                  : Image.memory(base64Decode(this.contact.photoProfile!))
+                      .image,
             ),
             SizedBox(
               width: 10,
@@ -157,18 +169,14 @@ class _ChatState extends State<Chat> {
     setState(() {
       if (_textController.text.trim().isEmpty) return;
       this._messagems.add(
-            Message(
+            MessageChat(
               _textController.text.trim(),
               MessageType.SEND,
             ),
           );
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      _webSocketController.send(_textController.text, this.contact.userName);
       _textController.clear();
     });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }

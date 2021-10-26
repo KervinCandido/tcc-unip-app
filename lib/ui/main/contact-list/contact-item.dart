@@ -1,12 +1,11 @@
 import 'dart:convert';
 
+import 'package:app_tcc_unip/model/contactRecommendation.dart';
 import 'package:app_tcc_unip/ui/main/chat/chat.dart';
 import 'package:flutter/material.dart';
 
-import '../../../model/contact.dart';
-
 class ContactItem extends StatefulWidget {
-  final Contact contact;
+  final ContactRecommendation contact;
   const ContactItem({Key? key, required this.contact}) : super(key: key);
 
   @override
@@ -14,7 +13,7 @@ class ContactItem extends StatefulWidget {
 }
 
 class _ContactItemState extends State<ContactItem> {
-  final Contact contact;
+  final ContactRecommendation contact;
 
   _ContactItemState(this.contact);
 
@@ -36,9 +35,10 @@ class _ContactItemState extends State<ContactItem> {
           children: [
             CircleAvatar(
               minRadius: 22,
-              backgroundImage: this.contact.photo == null
+              backgroundImage: this.contact.photoProfile == null
                   ? null
-                  : Image.memory(base64Decode(this.contact.photo!)).image,
+                  : Image.memory(base64Decode(this.contact.photoProfile!))
+                      .image,
             ),
             SizedBox(
               width: 10,
