@@ -8,7 +8,7 @@ class Message {
   final DateTime dateMessage;
 
   final _dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss SSS');
-  final _dateFormatBR = DateFormat('dd-MM-yyyy HH:mm:ss');
+  final _dateFormatBR = DateFormat('dd/MM/yyyy HH:mm:ss');
 
   Message(
     this.userId,
