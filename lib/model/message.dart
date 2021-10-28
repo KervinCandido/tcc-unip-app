@@ -1,23 +1,33 @@
+import 'package:intl/intl.dart';
+
 class Message {
-  final String sender;
-  final String receiver;
-  final String content;
+  final int userId;
+  final String userName;
+  final String message;
+  final bool isSend;
+  final DateTime dateMessage;
 
-  Message(this.sender, this.receiver, this.content);
+  final _dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss SSS');
+  final _dateFormatBR = DateFormat('dd-MM-yyyy HH:mm:ss');
 
-  factory Message.fromJson(Map<String, dynamic> json) {
-    return Message(
-      json['sender'],
-      json['receiver'],
-      json['content'],
-    );
-  }
+  Message(
+    this.userId,
+    this.userName,
+    this.message,
+    this.isSend,
+    this.dateMessage,
+  );
 
-  Map toJson() {
+  get _dateMessageFormattedDB => _dateFormat.format(dateMessage);
+  get dateMessageFormattedBR => _dateFormatBR.format(dateMessage);
+
+  Map<String, dynamic> toMap() {
     return {
-      "sender": sender,
-      "receiver": receiver,
-      "content": content,
+      'USER_ID': userId,
+      'USER_NAME': userName,
+      'MESSAGE': message,
+      'IS_SEND': isSend ? 1 : 0,
+      'DATE_MESSAGE': _dateMessageFormattedDB,
     };
   }
 }

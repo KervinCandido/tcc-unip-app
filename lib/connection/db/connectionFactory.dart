@@ -31,7 +31,28 @@ class ConnectionFactory {
           );''',
         );
       },
-      version: 1,
+      onUpgrade: (db, oldVersion, newVersion) async {
+        await db.execute(
+          '''CREATE TABLE IF NOT EXISTS contact(
+            USER_ID INTEGER,
+            PHOTO TEXT,
+            PROFILE_NAME TEXT NOT NULL,
+            USER_NAME TEXT PRIMARY KEY
+          ) WITHOUT ROWID;''',
+        );
+        await db.execute('DROP TABLE IF EXISTS message');
+        await db.execute(
+          '''CREATE TABLE IF NOT EXISTS message(
+            USER_ID INTEGER NOT NULL,
+            USER_NAME TEXT NOT NULL,
+            MESSAGE TEXT NOT NULL,
+            IS_SEND INTEGER NOT NULL,
+            DATE_MESSAGE TEXT NOT NULL,
+            PRIMARY KEY(USER_ID, USER_NAME, DATE_MESSAGE)
+          ) WITHOUT ROWID;''',
+        );
+      },
+      version: 8,
     );
   }
 }

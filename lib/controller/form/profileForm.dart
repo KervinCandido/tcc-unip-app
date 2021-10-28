@@ -9,6 +9,8 @@ class ProfileForm {
   String? photo;
   final String? description;
 
+  String? photoPath;
+
   ProfileForm(this.userId, this.profileName, this.birthDate, this.gender,
       this.photo, this.description);
 
@@ -29,7 +31,7 @@ class ProfileForm {
       profileName,
       birthDate,
       gender,
-      photo,
+      photoPath,
       description,
     );
   }

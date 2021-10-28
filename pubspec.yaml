@@ -24,6 +24,7 @@ dependencies:
   stomp_dart_client: ^0.4.3
   badges: ^2.0.1
   path_provider: ^2.0.4
+  image: ^3.0.8
 
 dev_dependencies:
   flutter_test:

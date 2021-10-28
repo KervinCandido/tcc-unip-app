@@ -5,7 +5,6 @@ import 'package:app_tcc_unip/ui/login/loginScreen.dart';
 import 'package:app_tcc_unip/ui/main/profile/editableProfile.dart';
 import 'package:app_tcc_unip/ui/main/profile/userNoHasProfile.dart';
 import 'package:app_tcc_unip/ui/main/profile/viewProfile.dart';
-import 'package:app_tcc_unip/ui/util/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 

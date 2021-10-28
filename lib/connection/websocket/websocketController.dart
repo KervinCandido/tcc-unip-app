@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:app_tcc_unip/dao/messageDAO.dart';
 import 'package:app_tcc_unip/model/contactRecommendation.dart';
 import 'package:app_tcc_unip/model/message.dart';
+import 'package:app_tcc_unip/model/messageForm.dart';
 import 'package:app_tcc_unip/model/requestAddContact.dart';
 import 'package:app_tcc_unip/service/tokenService.dart';
 import 'package:app_tcc_unip/service/userService.dart';
@@ -18,7 +20,7 @@ class WebsocketController {
   final List<Function(ContactRecommendation contactRecommendation)>
       _requestAddContact = [];
 
-  final List<Function(Message message)> _messageListener = [];
+  final List<Function(MessageForm message)> _messageListener = [];
 
   final String baseURL = dotenv.get(BASE_URL_API);
   final _tokenService = TokenService();
@@ -28,6 +30,8 @@ class WebsocketController {
   late String _userName;
 
   bool isActive = false;
+
+  final _messageDAO = MessageDAO();
 
   WebsocketController._();
 
@@ -58,7 +62,18 @@ class WebsocketController {
     stompClient.subscribe(
       destination: '/user/$_userName/message/queue',
       callback: (frame) {
-        var message = Message.fromJson(json.decode(frame.body!));
+        var message = MessageForm.fromJson(json.decode(frame.body!));
+
+        _userService
+            .getUserId()
+            .then((userId) => _messageDAO.insertOrUpdate(Message(
+                  userId,
+                  message.sender,
+                  message.content,
+                  false,
+                  DateTime.now(),
+                )));
+
         _messageListener.forEach((element) => element(message));
       },
     );
@@ -91,10 +106,20 @@ class WebsocketController {
     if (!isActive) {
       print('ative websocket para poder enviar');
     }
+    _userService
+        .getUserId()
+        .then((userId) => _messageDAO.insertOrUpdate(Message(
+              userId,
+              destination,
+              message,
+              true,
+              DateTime.now(),
+            )));
+
     stompClient.send(
       destination: '/app/send',
       body: jsonEncode(
-        Message(
+        MessageForm(
           _userName,
           destination,
           message,
@@ -156,11 +181,11 @@ class WebsocketController {
     _requestAddContact.remove(func);
   }
 
-  addMessageListener(Function(Message) listener) {
+  addMessageListener(Function(MessageForm) listener) {
     _messageListener.add(listener);
   }
 
-  removeMessageListener(Function(Message) listener) {
+  removeMessageListener(Function(MessageForm) listener) {
     _messageListener.remove(listener);
   }
 }

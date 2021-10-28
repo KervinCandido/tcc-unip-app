@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:app_tcc_unip/model/contactRecommendation.dart';
+import 'package:app_tcc_unip/service/userService.dart';
 import 'package:app_tcc_unip/ui/main/chat/chat.dart';
 import 'package:flutter/material.dart';
 
@@ -14,17 +16,19 @@ class ContactItem extends StatefulWidget {
 
 class _ContactItemState extends State<ContactItem> {
   final ContactRecommendation contact;
+  final _userService = UserService();
 
   _ContactItemState(this.contact);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
+        final id = await _userService.getUserId();
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) {
-              return Chat(this.contact);
+              return Chat(this.contact, id);
             },
           ),
         );
@@ -37,8 +41,7 @@ class _ContactItemState extends State<ContactItem> {
               minRadius: 22,
               backgroundImage: this.contact.photoProfile == null
                   ? null
-                  : Image.memory(base64Decode(this.contact.photoProfile!))
-                      .image,
+                  : Image.file(File(this.contact.photoProfile!)).image,
             ),
             SizedBox(
               width: 10,

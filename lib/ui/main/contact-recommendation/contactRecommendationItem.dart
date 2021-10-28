@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:app_tcc_unip/model/contactRecommendation.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +29,11 @@ class ContactRecommendationItem extends StatelessWidget {
             minRadius: 30,
             backgroundImage: this.contact.photoProfile == null
                 ? null
-                : Image.memory(base64Decode(this.contact.photoProfile!)).image,
+                : Image.memory(
+                    base64Decode(this.contact.photoProfile!),
+                    width: 120,
+                    height: 120,
+                  ).image,
           ),
           SizedBox(
             width: 10,

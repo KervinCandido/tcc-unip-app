@@ -12,6 +12,7 @@ import 'package:app_tcc_unip/service/userService.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:image/image.dart';
 
 const BASE_URL_API = 'BASE_URL_API';
 
@@ -54,23 +55,7 @@ class ProfileService {
     var token = await _tokenService.getTokenForResquest();
 
     if (profileForm.photo != null) {
-      final directory = await getApplicationDocumentsDirectory();
-      final path = directory.path;
-      final photo = profileForm.photo!;
-      var split = photo.split("\.");
-      var extension = '.${split[split.length - 1]}';
-      final photoFile = File(photo);
-
-      await Directory('$path/.tccunip/profile/').create(recursive: true);
-
-      var newFile =
-          File('$path/.tccunip/profile/${profileForm.userId}$extension');
-      await newFile.delete();
-
-      final newDirectory = await photoFile.copy(newFile.path);
-      profileForm.photo = newDirectory.path;
-
-      await photoFile.delete();
+      await trataPhotoParaBancoDoDispositivo(profileForm);
     }
 
     final response = await http.post(
@@ -88,7 +73,8 @@ class ProfileService {
       var profileDTO =
           ProfileDTO.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
 
-      await _profileDAO.insertOrUpdate(profileDTO.toProfile());
+      await _profileDAO.insertOrUpdate(profileForm.toProfile());
+      profileDTO.photo = profileForm.photoPath;
       return profileDTO;
     } else if (response.statusCode == 400) {
       Iterable it = jsonDecode(utf8.decode(response.bodyBytes));
@@ -102,30 +88,29 @@ class ProfileService {
     );
   }
 
-  Future<ProfileDTO> update(ProfileForm profileForm) async {
-    var token = await _tokenService.getTokenForResquest();
-    final response = await http.put(
-      Uri.parse('$baseURL/profile'),
-      body: jsonEncode(profileForm),
-      encoding: utf8,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept-Language': 'pt-BR',
-        'Authorization': token == null ? '' : token
-      },
-    );
+  Future<void> trataPhotoParaBancoDoDispositivo(ProfileForm profileForm) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final path = directory.path;
+    final photo = profileForm.photo!;
+    var split = photo.split("\.");
+    var extension = '.${split[split.length - 1]}';
+    final photoFile = File(photo);
 
-    if (response.statusCode == 200) {
-      return ProfileDTO.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
-    } else if (response.statusCode == 400) {
-      Iterable it = jsonDecode(utf8.decode(response.bodyBytes));
-      List<ErroFormDTO> errosFormDTO = List<ErroFormDTO>.from(
-          it.map((model) => ErroFormDTO.fromJson(model)));
-      throw ErroFormException(errosFormDTO);
-    }
+    await Directory('$path/.tccunip/profile/').create(recursive: true);
+    var millisecond = DateTime.now().millisecond;
+    var newFile = File(
+        '$path/.tccunip/profile/${profileForm.userId}$millisecond$extension');
 
-    throw Exception(
-      'Falha ao criar perfil: { statusCode: ${response.statusCode}, body: ${response.body}',
-    );
+    final image = decodeImage(photoFile.readAsBytesSync());
+    var resizedImage = copyResize(image!, width: 120, height: 120);
+    var encodedImage = encodeJpg(resizedImage);
+    newFile.writeAsBytesSync(encodedImage);
+
+    profileForm.photo = base64Encode(encodedImage);
+    profileForm.photoPath = newFile.path;
+
+    await photoFile.delete();
+    // if (newFile.path != photoFile.path) {
+    // }
   }
 }

@@ -7,7 +7,7 @@ class ProfileDTO {
   final String profileName;
   final DateTime birthDate;
   final String gender;
-  final String? photo;
+  String? photo;
   final String? description;
 
   ProfileDTO({
