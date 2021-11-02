@@ -90,6 +90,12 @@ class WebsocketController {
         print('resquest recebida');
         var contactRecommendation =
             ContactRecommendation.fromJson(jsonDecode(frame.body!));
+
+        if (contactRecommendation.photoProfile != null) {
+          contactRecommendation.photoProfile =
+              '$baseURL${contactRecommendation.photoProfile}';
+        }
+
         _requestAddContact.forEach((element) => element(contactRecommendation));
       },
     );

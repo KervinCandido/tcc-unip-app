@@ -3,13 +3,38 @@ import 'package:app_tcc_unip/ui/main/mainScreen.dart';
 import 'package:app_tcc_unip/ui/signUp/signUpScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
-
   var _authController = AuthController();
+
+  final notificationPlugin = FlutterLocalNotificationsPlugin();
+  final androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+  final initializationSettings = InitializationSettings(
+    android: androidSettings,
+  );
+
+  await notificationPlugin.initialize(initializationSettings,
+      onSelectNotification: (String? payload) async {
+    if (payload != null) {
+      debugPrint('notification payload: $payload');
+    }
+  });
+
+  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails('tccunip@2021', 'tcc unip',
+          channelDescription: 'tcc unip',
+          importance: Importance.high,
+          priority: Priority.high,
+          ticker: 'ticker');
+  const NotificationDetails platformChannelSpecifics =
+      NotificationDetails(android: androidPlatformChannelSpecifics);
+  // await notificationPlugin.show(
+  //     0, 'plain title', 'plain body', platformChannelSpecifics,
+  //     payload: 'item x');
 
   runApp(
     MaterialApp(

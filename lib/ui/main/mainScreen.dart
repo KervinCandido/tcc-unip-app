@@ -33,7 +33,6 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   getNotification(ContactRecommendation contactRecommendation) {
-    print('$contactRecommendation');
     setState(() {
       var indexOf = notificationList.indexOf(contactRecommendation);
       if (indexOf > 0) {

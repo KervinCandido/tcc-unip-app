@@ -24,7 +24,7 @@ class NotificationItem extends StatelessWidget {
             minRadius: 30,
             backgroundImage: this.contact.photoProfile == null
                 ? null
-                : Image.memory(base64Decode(this.contact.photoProfile!)).image,
+                : Image.network(this.contact.photoProfile!).image,
           ),
           SizedBox(
             width: 10,

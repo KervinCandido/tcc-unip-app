@@ -41,7 +41,7 @@ class _ContactItemState extends State<ContactItem> {
               minRadius: 22,
               backgroundImage: this.contact.photoProfile == null
                   ? null
-                  : Image.file(File(this.contact.photoProfile!)).image,
+                  : Image.network(this.contact.photoProfile!).image,
             ),
             SizedBox(
               width: 10,

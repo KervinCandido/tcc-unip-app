@@ -37,7 +37,7 @@ class _ViewProfileState extends State<ViewProfile> {
                   child: CircleAvatar(
                     backgroundImage: this.profile.photo == null
                         ? null
-                        : Image.file(File(this.profile.photo!)).image,
+                        : Image.network(this.profile.photo!).image,
                   ),
                 ),
               ),

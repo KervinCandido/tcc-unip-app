@@ -29,8 +29,8 @@ class ContactRecommendationItem extends StatelessWidget {
             minRadius: 30,
             backgroundImage: this.contact.photoProfile == null
                 ? null
-                : Image.memory(
-                    base64Decode(this.contact.photoProfile!),
+                : Image.network(
+                    this.contact.photoProfile!,
                     width: 120,
                     height: 120,
                   ).image,

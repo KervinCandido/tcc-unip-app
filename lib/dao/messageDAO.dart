@@ -37,4 +37,23 @@ class MessageDAO {
       ),
     );
   }
+
+  Future<Message> lastMessage(int userId, String userName) async {
+    final db = await _db.connection;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'message',
+      where: "USER_ID = ? AND USER_NAME = ?",
+      whereArgs: [userId, userName],
+      orderBy: "DATE_MESSAGE DESC",
+      limit: 1,
+    );
+
+    return Message(
+      maps[0]['USER_ID'],
+      maps[0]['USER_NAME'],
+      maps[0]['MESSAGE'],
+      maps[0]['IS_SEND'] == 1,
+      _dateFormat.parse(maps[0]['DATE_MESSAGE']),
+    );
+  }
 }

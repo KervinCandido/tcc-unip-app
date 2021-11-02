@@ -31,7 +31,9 @@ class ProfileService {
     Profile? profile = await _profileDAO.profileByUserId(userId);
 
     if (profile != null) {
-      return ProfileDTO.fromProfile(profile);
+      var profileDTO = ProfileDTO.fromProfile(profile);
+      _trataPhotoUrl(profileDTO);
+      return profileDTO;
     }
 
     print('buscando id do usuário');
@@ -45,7 +47,10 @@ class ProfileService {
     );
     print(response.statusCode);
     if (response.statusCode == 200) {
-      return ProfileDTO.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+      var profileDTO =
+          ProfileDTO.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+      _trataPhotoUrl(profileDTO);
+      return profileDTO;
     }
 
     return null;
@@ -54,27 +59,45 @@ class ProfileService {
   Future<ProfileDTO> create(ProfileForm profileForm) async {
     var token = await _tokenService.getTokenForResquest();
 
+    // if (profileForm.photo != null) {
+    //   await trataPhotoParaBancoDoDispositivo(profileForm);
+    // }
+
+    int userId = await _userService.getUserId();
+
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse('$baseURL/profile'),
+    );
+
+    request.headers.addAll({
+      'Content-Type': 'multipart/form-data',
+      'Accept-Language': 'pt-BR',
+      'Authorization': token == null ? '' : token
+    });
+
     if (profileForm.photo != null) {
-      await trataPhotoParaBancoDoDispositivo(profileForm);
+      request.files.add(
+          await http.MultipartFile.fromPath("photo", profileForm.photo!.path));
     }
 
-    final response = await http.post(
-      Uri.parse('$baseURL/profile'),
-      body: jsonEncode(profileForm),
-      encoding: utf8,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept-Language': 'pt-BR',
-        'Authorization': token == null ? '' : token
-      },
-    );
+    request.fields.addAll({
+      'userId': '$userId',
+      'profileName': profileForm.profileName,
+      'birthDate': profileForm.birthDateISO,
+      'gender': profileForm.gender,
+      'description': profileForm.description ?? '',
+    });
+
+    var streamedResponse = await request.send();
+
+    var response = await http.Response.fromStream(streamedResponse);
 
     if (response.statusCode == 201) {
       var profileDTO =
           ProfileDTO.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
-
-      await _profileDAO.insertOrUpdate(profileForm.toProfile());
-      profileDTO.photo = profileForm.photoPath;
+      await _profileDAO.insertOrUpdate(profileDTO.toProfile());
+      _trataPhotoUrl(profileDTO);
       return profileDTO;
     } else if (response.statusCode == 400) {
       Iterable it = jsonDecode(utf8.decode(response.bodyBytes));
@@ -88,29 +111,35 @@ class ProfileService {
     );
   }
 
-  Future<void> trataPhotoParaBancoDoDispositivo(ProfileForm profileForm) async {
-    final directory = await getApplicationDocumentsDirectory();
-    final path = directory.path;
-    final photo = profileForm.photo!;
-    var split = photo.split("\.");
-    var extension = '.${split[split.length - 1]}';
-    final photoFile = File(photo);
+  // Future<void> trataPhotoParaBancoDoDispositivo(ProfileForm profileForm) async {
+  //   final directory = await getApplicationDocumentsDirectory();
+  //   final path = directory.path;
+  //   final photo = profileForm.photo!;
+  //   var split = photo.split("\.");
+  //   var extension = '.${split[split.length - 1]}';
+  //   final photoFile = File(photo);
 
-    await Directory('$path/.tccunip/profile/').create(recursive: true);
-    var millisecond = DateTime.now().millisecond;
-    var newFile = File(
-        '$path/.tccunip/profile/${profileForm.userId}$millisecond$extension');
+  //   await Directory('$path/.tccunip/profile/').create(recursive: true);
+  //   var millisecond = DateTime.now().millisecond;
+  //   var newFile = File(
+  //       '$path/.tccunip/profile/${profileForm.userId}$millisecond$extension');
 
-    final image = decodeImage(photoFile.readAsBytesSync());
-    var resizedImage = copyResize(image!, width: 120, height: 120);
-    var encodedImage = encodeJpg(resizedImage);
-    newFile.writeAsBytesSync(encodedImage);
+  //   final image = decodeImage(photoFile.readAsBytesSync());
+  //   var resizedImage = copyResize(image!, width: 120, height: 120);
+  //   var encodedImage = encodeJpg(resizedImage);
+  //   newFile.writeAsBytesSync(encodedImage);
 
-    profileForm.photo = base64Encode(encodedImage);
-    profileForm.photoPath = newFile.path;
+  //   profileForm.photo = base64Encode(encodedImage);
+  //   profileForm.photoPath = newFile.path;
 
-    await photoFile.delete();
-    // if (newFile.path != photoFile.path) {
-    // }
+  //   await photoFile.delete();
+  //   // if (newFile.path != photoFile.path) {
+  //   // }
+  // }
+
+  void _trataPhotoUrl(ProfileDTO profileDTO) {
+    if (profileDTO.photo != null) {
+      profileDTO.photo = '$baseURL${profileDTO.photo}';
+    }
   }
 }

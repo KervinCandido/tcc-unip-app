@@ -70,7 +70,7 @@ class _ChatState extends State<Chat> {
 
           SchedulerBinding.instance!.addPostFrameCallback((_) {
             _scrollController
-                .jumpTo(_scrollController.position.maxScrollExtent);
+                .jumpTo(_scrollController.position.maxScrollExtent + 50);
           });
           return Scaffold(
             appBar: AppBar(

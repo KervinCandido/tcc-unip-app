@@ -40,25 +40,11 @@ class ContactService {
         ContactRecommendationConverter(),
       );
 
-      // final directory = await getApplicationDocumentsDirectory();
-      // final path = directory.path;
-
-      // var recommendationDir = Directory('$path/.tccunip/recommendation');
-      // if (await recommendationDir.exists()) {
-      //   await recommendationDir.delete(recursive: true);
-      // }
-      // await recommendationDir.create(recursive: true);
-
-      // pageSpring.content.forEach((element) {
-      //   var photoProfile = element.photoProfile;
-      //   if (photoProfile != null) {
-      //     var base64decode = base64Decode(photoProfile);
-      //     var file = File('${recommendationDir.path}/${element.userName}.jpg');
-      //     print(file);
-      //     file.writeAsBytesSync(base64decode);
-      //     element.photoProfile = file.path;
-      //   }
-      // });
+      pageSpring.content.forEach((contact) {
+        if (contact.photoProfile != null) {
+          contact.photoProfile = '$baseURL${contact.photoProfile}';
+        }
+      });
 
       return pageSpring.content;
     }
@@ -77,7 +63,8 @@ class ContactService {
           .map(
             (contact) => ContactRecommendation(
               userName: contact.userName,
-              photoProfile: contact.photo,
+              photoProfile:
+                  contact.photo != null ? '$baseURL${contact.photo}' : null,
               profileName: contact.profileName,
             ),
           )
@@ -102,22 +89,6 @@ class ContactService {
       var content = pageSpring.content;
 
       for (var cr in content) {
-        if (cr.photoProfile != null) {
-          final directory = await getApplicationDocumentsDirectory();
-          final path = directory.path;
-          var millisecond = DateTime.now().millisecond;
-          var baseDir = File('$path/.tccunip/contact/${cr.userName}/');
-          if (baseDir.existsSync()) {
-            baseDir.deleteSync(recursive: true);
-          }
-          var newFile =
-              File('$path/.tccunip/contact/${cr.userName}/$millisecond.jpg');
-          newFile.createSync(recursive: true);
-
-          newFile.writeAsBytesSync(base64Decode(cr.photoProfile!));
-          cr.photoProfile = newFile.path;
-        }
-
         await _contactDAO.insertOrUpdate(
           Contact(
             userId,
@@ -126,6 +97,9 @@ class ContactService {
             cr.userName,
           ),
         );
+        if (cr.photoProfile != null) {
+          cr.photoProfile = '$baseURL${cr.photoProfile}';
+        }
       }
       return content;
     }

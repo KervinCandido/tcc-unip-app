@@ -47,11 +47,13 @@ class _EditableProfileState extends State<EditableProfile> {
   var _birthDateFormat = DateFormat('dd/MM/yyyy');
 
   int _userId = 0;
-  String? _photo;
   var _profileNameController = TextEditingController();
   var _birthDateController = TextEditingController();
   Gender? _gender;
   var _descriptionController = TextEditingController();
+
+  ImageProvider? _photoProfile;
+  File? _photo;
 
   _EditableProfileState([this.profile]) {
     _profileNameController =
@@ -60,7 +62,14 @@ class _EditableProfileState extends State<EditableProfile> {
         TextEditingController(text: profile?.birthDateFormatted ?? null);
     _descriptionController =
         TextEditingController(text: profile?.description ?? null);
-    _photo = profile?.photo ?? null;
+
+    _photoProfile = profile != null && profile!.photo != null
+        ? Image.network(
+            profile!.photo!,
+            width: 120,
+            cacheWidth: 120,
+          ).image
+        : null;
   }
 
   Future<int> get user => _userService.getUserId();
@@ -98,13 +107,7 @@ class _EditableProfileState extends State<EditableProfile> {
                                 width: 120,
                                 height: 120,
                                 child: CircleAvatar(
-                                  backgroundImage: _photo != null
-                                      ? Image.file(
-                                          File(_photo!),
-                                          width: 120,
-                                          height: 120,
-                                        ).image
-                                      : null,
+                                  backgroundImage: _photoProfile,
                                 ),
                               ),
                               Align(
@@ -147,7 +150,9 @@ class _EditableProfileState extends State<EditableProfile> {
                                                 }
 
                                                 setState(() {
-                                                  _photo = picture.path;
+                                                  _photo = File(picture.path);
+                                                  _photoProfile =
+                                                      Image.file(_photo!).image;
                                                 });
                                                 Navigator.pop(context);
                                               },
@@ -172,7 +177,10 @@ class _EditableProfileState extends State<EditableProfile> {
                                                     return;
                                                   }
                                                   setState(() {
-                                                    _photo = picture.path;
+                                                    _photo = File(picture.path);
+                                                    _photoProfile =
+                                                        Image.file(_photo!)
+                                                            .image;
                                                   });
                                                   Navigator.pop(context);
                                                 }),
@@ -355,14 +363,14 @@ class _EditableProfileState extends State<EditableProfile> {
             if (_userId < 1) return;
             var profileName = _profileNameController.text;
             var birthDate = _birthDateFormat.parse(_birthDateController.text);
-            var photo = _photo;
+
             var description = _descriptionController.text;
             var profileForm = ProfileForm(
               _userId,
               profileName,
               birthDate,
               _genderSelectorKey.currentState!.genderSelect!.value,
-              photo,
+              _photo,
               description,
             );
             var loading = Loading();
