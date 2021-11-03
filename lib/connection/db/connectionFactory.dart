@@ -30,8 +30,6 @@ class ConnectionFactory {
             DESCRIPTION TEXT
           );''',
         );
-      },
-      onUpgrade: (db, oldVersion, newVersion) async {
         await db.execute(
           '''CREATE TABLE IF NOT EXISTS contact(
             USER_ID INTEGER,
@@ -40,7 +38,6 @@ class ConnectionFactory {
             USER_NAME TEXT PRIMARY KEY
           ) WITHOUT ROWID;''',
         );
-        await db.execute('DROP TABLE IF EXISTS message');
         await db.execute(
           '''CREATE TABLE IF NOT EXISTS message(
             USER_ID INTEGER NOT NULL,
@@ -52,7 +49,8 @@ class ConnectionFactory {
           ) WITHOUT ROWID;''',
         );
       },
-      version: 8,
+      onUpgrade: (db, oldVersion, newVersion) async {},
+      version: 1,
     );
   }
 }

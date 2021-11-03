@@ -1,5 +1,6 @@
 import 'package:app_tcc_unip/connection/websocket/websocketController.dart';
 import 'package:app_tcc_unip/model/contactRecommendation.dart';
+import 'package:app_tcc_unip/model/requestContact.dart';
 import 'package:app_tcc_unip/service/authService.dart';
 import 'package:app_tcc_unip/service/tokenService.dart';
 import 'package:app_tcc_unip/ui/login/loginScreen.dart';
@@ -19,7 +20,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   final _webSocketController = WebsocketController.getInstance();
-  final List<ContactRecommendation> notificationList = [];
+  final List<RequestContact> notificationList = [];
 
   _MainScreenState() {
     _webSocketController.active();
@@ -32,13 +33,13 @@ class _MainScreenState extends State<MainScreen> {
     _webSocketController.removeRequestAddContactListener(getNotification);
   }
 
-  getNotification(ContactRecommendation contactRecommendation) {
+  getNotification(RequestContact requestContact) {
     setState(() {
-      var indexOf = notificationList.indexOf(contactRecommendation);
+      var indexOf = notificationList.indexOf(requestContact);
       if (indexOf > 0) {
-        notificationList[indexOf] = contactRecommendation;
+        notificationList[indexOf] = requestContact;
       } else {
-        notificationList.add(contactRecommendation);
+        notificationList.add(requestContact);
       }
     });
   }

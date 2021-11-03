@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:app_tcc_unip/model/contactRecommendation.dart';
 import 'package:flutter/material.dart';
 

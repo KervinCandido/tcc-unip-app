@@ -139,6 +139,10 @@ class _ViewProfileState extends State<ViewProfile> {
           if (result == null) return;
           setState(() {
             profile = result;
+            if (profile.photo != null) {
+              profile.photo =
+                  '${profile.photo}?v=${DateTime.now().millisecondsSinceEpoch}';
+            }
           });
         },
         child: const Icon(Icons.edit),

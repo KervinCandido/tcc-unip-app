@@ -2,6 +2,8 @@ import 'package:app_tcc_unip/connection/websocket/websocketController.dart';
 import 'package:app_tcc_unip/model/contactRecommendation.dart';
 import 'package:app_tcc_unip/service/contactService.dart';
 import 'package:app_tcc_unip/ui/main/contact-recommendation/contactRecommendationItem.dart';
+import 'package:app_tcc_unip/ui/main/contact-recommendation/contactRecommendationList.dart';
+import 'package:app_tcc_unip/ui/util/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -16,6 +18,7 @@ class ViewContactRecommendation extends StatefulWidget {
 class _ViewContactRecommendationState extends State<ViewContactRecommendation> {
   final _webSocketController = WebsocketController.getInstance();
   var _contactService = ContactService();
+  final List<ContactRecommendation> recommendation = [];
 
   @override
   Widget build(BuildContext context) {
@@ -29,29 +32,7 @@ class _ViewContactRecommendationState extends State<ViewContactRecommendation> {
             List<ContactRecommendation> recommendation =
                 snapshot.data ?? List.empty();
 
-            return Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: ListView.separated(
-                itemCount: recommendation.length,
-                itemBuilder: (_, int index) {
-                  return Container(
-                    child: ContactRecommendationItem(
-                      contact: recommendation[index],
-                      onAdd: (var contact) {
-                        setState(() {
-                          recommendation.remove(contact);
-                          _webSocketController.requestAddContact(contact);
-                        });
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('Requisição enviada !!'),
-                        ));
-                      },
-                    ),
-                  );
-                },
-                separatorBuilder: (_, __) => const Divider(),
-              ),
-            );
+            return ContactRecommendationList(recommendation);
           }
 
           return Container(

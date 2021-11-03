@@ -1,10 +1,13 @@
 import 'dart:convert';
 
 import 'package:app_tcc_unip/dao/messageDAO.dart';
+import 'package:app_tcc_unip/model/confirmationRequest.dart';
 import 'package:app_tcc_unip/model/contactRecommendation.dart';
 import 'package:app_tcc_unip/model/message.dart';
 import 'package:app_tcc_unip/model/messageForm.dart';
+import 'package:app_tcc_unip/model/rejectRequest.dart';
 import 'package:app_tcc_unip/model/requestAddContact.dart';
+import 'package:app_tcc_unip/model/requestContact.dart';
 import 'package:app_tcc_unip/service/tokenService.dart';
 import 'package:app_tcc_unip/service/userService.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -17,7 +20,7 @@ const BASE_URL_API = 'BASE_URL_API';
 class WebsocketController {
   static WebsocketController _instance = WebsocketController._();
 
-  final List<Function(ContactRecommendation contactRecommendation)>
+  final List<Function(RequestContact contactRecommendation)>
       _requestAddContact = [];
 
   final List<Function(MessageForm message)> _messageListener = [];
@@ -88,15 +91,10 @@ class WebsocketController {
       destination: '/user/$_userName/contact/request/queue',
       callback: (frame) {
         print('resquest recebida');
-        var contactRecommendation =
-            ContactRecommendation.fromJson(jsonDecode(frame.body!));
-
-        if (contactRecommendation.photoProfile != null) {
-          contactRecommendation.photoProfile =
-              '$baseURL${contactRecommendation.photoProfile}';
-        }
-
-        _requestAddContact.forEach((element) => element(contactRecommendation));
+        var requestContact = RequestContact.fromJson(jsonDecode(frame.body!));
+        _trataUrlPhoto(requestContact.requester);
+        _trataUrlPhoto(requestContact.requested);
+        _requestAddContact.forEach((element) => element(requestContact));
       },
     );
 
@@ -106,6 +104,13 @@ class WebsocketController {
         print(json.decode(frame.body!));
       },
     );
+  }
+
+  void _trataUrlPhoto(ContactRecommendation contactRecommendation) {
+    if (contactRecommendation.photoProfile != null) {
+      contactRecommendation.photoProfile =
+          '$baseURL${contactRecommendation.photoProfile}';
+    }
   }
 
   void send(String message, String destination) {
@@ -153,37 +158,37 @@ class WebsocketController {
     );
   }
 
-  void acceptContact(ContactRecommendation recommendation) {
-    RequestAddContact rad = RequestAddContact(
-      from: _userName,
-      to: recommendation.userName,
+  void acceptContact(int idRequest, ContactRecommendation recommendation) {
+    var confirm = ConfirmationRequest(
+      idRequest,
+      _userName,
+      recommendation.userName,
     );
 
     stompClient.send(
       destination: '/app/contact/confirmation',
-      body: jsonEncode(rad),
+      body: jsonEncode(confirm),
     );
   }
 
-  void rejectContact(ContactRecommendation recommendation) {
-    RequestAddContact rad = RequestAddContact(
-      from: _userName,
-      to: recommendation.userName,
+  void rejectContact(int idRequest, ContactRecommendation recommendation) {
+    var reject = RejectRequest(
+      idRequest,
+      _userName,
+      recommendation.userName,
     );
 
     stompClient.send(
       destination: '/app/contact/reject',
-      body: jsonEncode(rad),
+      body: jsonEncode(reject),
     );
   }
 
-  addRequestAddContactListener(
-      Function(ContactRecommendation contactRecommendation) func) {
+  addRequestAddContactListener(void Function(RequestContact) func) {
     _requestAddContact.add(func);
   }
 
-  removeRequestAddContactListener(
-      Function(ContactRecommendation contactRecommendation) func) {
+  removeRequestAddContactListener(void Function(RequestContact) func) {
     _requestAddContact.remove(func);
   }
 
