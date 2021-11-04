@@ -82,7 +82,7 @@ class _ChatState extends State<Chat> {
                     minRadius: 20,
                     backgroundImage: this.contact.photoProfile == null
                         ? null
-                        : Image.file(File(this.contact.photoProfile!)).image,
+                        : Image.network(this.contact.photoProfile!).image,
                   ),
                   SizedBox(
                     width: 10,
