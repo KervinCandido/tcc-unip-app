@@ -56,20 +56,20 @@ class ContactService {
     var token = await _tokenService.getTokenForResquest();
     var userId = await _userService.getUserId();
 
-    var listContacts = await _contactDAO.listContacts(userId);
+    // var listContacts = await _contactDAO.listContacts(userId);
 
-    if (listContacts.isNotEmpty) {
-      return listContacts
-          .map(
-            (contact) => ContactRecommendation(
-              userName: contact.userName,
-              photoProfile:
-                  contact.photo != null ? '$baseURL${contact.photo}' : null,
-              profileName: contact.profileName,
-            ),
-          )
-          .toList();
-    }
+    // if (listContacts.isNotEmpty) {
+    //   return listContacts
+    //       .map(
+    //         (contact) => ContactRecommendation(
+    //           userName: contact.userName,
+    //           photoProfile:
+    //               contact.photo != null ? '$baseURL${contact.photo}' : null,
+    //           profileName: contact.profileName,
+    //         ),
+    //       )
+    //       .toList();
+    // }
 
     final response = await http.get(
       Uri.parse('$baseURL/contact/$userId'),

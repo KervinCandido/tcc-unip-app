@@ -59,7 +59,7 @@ class _ChatState extends State<Chat> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Message>>(
-      future: _messageDAO.messageList(userId),
+      future: _messageDAO.messageList(userId, this.contact.userName),
       builder: (
         BuildContext context,
         AsyncSnapshot<List<Message>> snapshot,
@@ -166,16 +166,16 @@ class _ChatState extends State<Chat> {
 
   void sendMessage() {
     if (_textController.text.trim().isEmpty) return;
-    this.messagemList.add(
-          Message(
-            userId,
-            this.contact.userName,
-            _textController.text.trim(),
-            true,
-            DateTime.now(),
-          ),
-        );
     setState(() {
+      this.messagemList.add(
+            Message(
+              userId,
+              this.contact.userName,
+              _textController.text.trim(),
+              true,
+              DateTime.now(),
+            ),
+          );
       _webSocketController.send(_textController.text, this.contact.userName);
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
       _textController.clear();

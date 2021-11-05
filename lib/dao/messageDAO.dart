@@ -17,12 +17,12 @@ class MessageDAO {
     print('message inserida');
   }
 
-  Future<List<Message>> messageList(int userId) async {
+  Future<List<Message>> messageList(int userId, String userName) async {
     final db = await _db.connection;
     final List<Map<String, dynamic>> maps = await db.query(
       'message',
-      where: "USER_ID = ?",
-      whereArgs: [userId],
+      where: "USER_ID = ? AND USER_NAME = ?",
+      whereArgs: [userId, userName],
       orderBy: "DATE_MESSAGE ASC",
     );
 
