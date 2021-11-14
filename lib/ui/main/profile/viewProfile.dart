@@ -15,7 +15,9 @@ class ViewProfile extends StatefulWidget {
 
 class _ViewProfileState extends State<ViewProfile> {
   ProfileDTO profile;
-  _ViewProfileState(this.profile);
+  _ViewProfileState(this.profile) {
+    PaintingBinding.instance!.imageCache!.clear();
+  }
 
   @override
   Widget build(BuildContext context) {

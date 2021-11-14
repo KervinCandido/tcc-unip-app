@@ -17,7 +17,9 @@ class _ContactRecommendationListState extends State<ContactRecommendationList> {
   final _webSocketController = WebsocketController.getInstance();
   final List<ContactRecommendation> recommendation;
 
-  _ContactRecommendationListState(this.recommendation);
+  _ContactRecommendationListState(this.recommendation) {
+    PaintingBinding.instance!.imageCache!.clear();
+  }
 
   @override
   Widget build(BuildContext context) {

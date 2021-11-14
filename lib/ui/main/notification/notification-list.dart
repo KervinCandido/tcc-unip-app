@@ -20,7 +20,9 @@ class _NotificationListState extends State<NotificationList> {
   final void Function(RequestContact) onActionItem;
   final List<RequestContact> contactList;
 
-  _NotificationListState(this.contactList, this.onActionItem);
+  _NotificationListState(this.contactList, this.onActionItem) {
+    PaintingBinding.instance!.imageCache!.clear();
+  }
 
   @override
   Widget build(BuildContext context) {

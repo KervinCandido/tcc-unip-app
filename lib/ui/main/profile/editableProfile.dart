@@ -67,9 +67,9 @@ class _EditableProfileState extends State<EditableProfile> {
         ? Image.network(
             profile!.photo!,
             width: 120,
-            cacheWidth: 120,
           ).image
         : null;
+    PaintingBinding.instance!.imageCache!.clear();
   }
 
   Future<int> get user => _userService.getUserId();

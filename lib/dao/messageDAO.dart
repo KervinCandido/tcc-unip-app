@@ -48,6 +48,16 @@ class MessageDAO {
       limit: 1,
     );
 
+    if (maps.isEmpty) {
+      return Message(
+        userId,
+        userName,
+        '',
+        false,
+        DateTime.now(),
+      );
+    }
+
     return Message(
       maps[0]['USER_ID'],
       maps[0]['USER_NAME'],

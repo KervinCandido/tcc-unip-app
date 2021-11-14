@@ -19,7 +19,7 @@ class NotificationItem extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            minRadius: 30,
+            minRadius: 28,
             backgroundImage: this.contact.photoProfile == null
                 ? null
                 : Image.network(this.contact.photoProfile!).image,
@@ -35,21 +35,26 @@ class NotificationItem extends StatelessWidget {
                   this.contact.profileName,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
-                GestureDetector(
-                  onTap: () => accept(true),
-                  child: Icon(
-                    Icons.check,
-                    color: Colors.green,
-                    size: 35.0,
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => accept(false),
-                  child: Icon(
-                    Icons.close_rounded,
-                    color: Colors.red,
-                    size: 35.0,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () => accept(true),
+                      child: Icon(
+                        Icons.check,
+                        color: Colors.green,
+                        size: 35.0,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => accept(false),
+                      child: Icon(
+                        Icons.close_rounded,
+                        color: Colors.red,
+                        size: 35.0,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

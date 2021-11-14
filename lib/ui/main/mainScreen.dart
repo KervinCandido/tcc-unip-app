@@ -2,6 +2,7 @@ import 'package:app_tcc_unip/connection/websocket/websocketController.dart';
 import 'package:app_tcc_unip/model/contactRecommendation.dart';
 import 'package:app_tcc_unip/model/requestContact.dart';
 import 'package:app_tcc_unip/service/authService.dart';
+import 'package:app_tcc_unip/service/contactService.dart';
 import 'package:app_tcc_unip/service/tokenService.dart';
 import 'package:app_tcc_unip/ui/login/loginScreen.dart';
 import 'package:app_tcc_unip/ui/main/contact-list/contact-list.dart';
@@ -20,11 +21,14 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   final _webSocketController = WebsocketController.getInstance();
+  final _contactService = ContactService();
   final List<RequestContact> notificationList = [];
 
   _MainScreenState() {
     _webSocketController.active();
     _webSocketController.addRequestAddContactListener(getNotification);
+    _contactService.getNotifications().then((contactRequestList) =>
+        setState(() => notificationList.addAll(contactRequestList)));
   }
 
   @override

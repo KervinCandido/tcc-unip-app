@@ -1,4 +1,4 @@
-import 'package:app_tcc_unip/model/contactRecommendation.dart';
+import 'package:app_tcc_unip/model/contactWithLastMessage.dart';
 import 'package:app_tcc_unip/service/contactService.dart';
 import 'package:app_tcc_unip/ui/main/contact-list/contact-item.dart';
 import 'package:flutter/material.dart';
@@ -14,16 +14,20 @@ class ContactList extends StatefulWidget {
 class _ContactListState extends State<ContactList> {
   final _contactService = ContactService();
 
+  _ContactListState() {
+    PaintingBinding.instance!.imageCache!.clear();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<ContactRecommendation>>(
+    return FutureBuilder<List<ContactWithLastMessage>>(
         future: _contactService.getContacts(),
         builder: (
           BuildContext context,
-          AsyncSnapshot<List<ContactRecommendation>> snapshot,
+          AsyncSnapshot<List<ContactWithLastMessage>> snapshot,
         ) {
           if (snapshot.hasData) {
-            List<ContactRecommendation> contacts =
+            List<ContactWithLastMessage> contacts =
                 snapshot.data ?? List.empty();
 
             return Padding(

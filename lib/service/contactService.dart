@@ -1,17 +1,19 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:app_tcc_unip/dao/contactDAO.dart';
+import 'package:app_tcc_unip/dao/messageDAO.dart';
 import 'package:app_tcc_unip/model/ContactRecommendationConverter.dart';
 import 'package:app_tcc_unip/model/contact.dart';
 import 'package:app_tcc_unip/model/contactRecommendation.dart';
+import 'package:app_tcc_unip/model/contactWithLastMessage.dart';
 import 'package:app_tcc_unip/model/pageSpring.dart';
+import 'package:app_tcc_unip/model/requestContact.dart';
+import 'package:app_tcc_unip/model/requestContactConverter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:app_tcc_unip/service/tokenService.dart';
 import 'package:app_tcc_unip/service/userService.dart';
-import 'package:path_provider/path_provider.dart';
 
 const BASE_URL_API = 'BASE_URL_API';
 
@@ -52,7 +54,7 @@ class ContactService {
     return List.empty();
   }
 
-  Future<List<ContactRecommendation>> getContacts() async {
+  Future<List<ContactWithLastMessage>> getContacts() async {
     var token = await _tokenService.getTokenForResquest();
     var userId = await _userService.getUserId();
 
@@ -87,6 +89,7 @@ class ContactService {
       );
 
       var content = pageSpring.content;
+      final List<ContactWithLastMessage> _contacts = [];
 
       for (var cr in content) {
         await _contactDAO.insertOrUpdate(
@@ -100,8 +103,51 @@ class ContactService {
         if (cr.photoProfile != null) {
           cr.photoProfile = '$baseURL${cr.photoProfile}';
         }
+        final _messageDAO = MessageDAO();
+        final _message = await _messageDAO.lastMessage(userId, cr.userName);
+        _contacts.add(ContactWithLastMessage(
+          userName: cr.userName,
+          photoProfile: cr.photoProfile,
+          profileName: cr.profileName,
+          lastMessage:
+              _message.isSend ? 'Você: ${_message.message}' : _message.message,
+        ));
       }
-      return content;
+
+      return _contacts;
+    }
+
+    return List.empty();
+  }
+
+  Future<List<RequestContact>> getNotifications() async {
+    var token = await _tokenService.getTokenForResquest();
+    var userId = await _userService.getUserId();
+
+    final response = await http.get(
+      Uri.parse('$baseURL/contact/requested/$userId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept-Language': 'pt-BR',
+        'Authorization': token == null ? '' : token
+      },
+    );
+
+    if (response.statusCode == 200) {
+      PageSpring<RequestContact> pageSpring = PageSpring.fromJson(
+        jsonDecode(utf8.decode(response.bodyBytes)),
+        RequestContactConverter(),
+      );
+
+      return pageSpring.content.map((c) {
+        if (c.requester.photoProfile != null) {
+          c.requester.photoProfile = '$baseURL${c.requested.photoProfile}';
+        }
+        if (c.requested.photoProfile != null) {
+          c.requested.photoProfile = '$baseURL${c.requested.photoProfile}';
+        }
+        return c;
+      }).toList();
     }
 
     return List.empty();
