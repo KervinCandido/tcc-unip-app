@@ -1,3 +1,5 @@
+import 'package:app_tcc_unip/model/movieGenrer.dart';
+import 'package:app_tcc_unip/model/musicalGenrer.dart';
 import 'package:intl/intl.dart';
 
 class Profile {
@@ -7,11 +9,21 @@ class Profile {
   final String gender;
   final String? photo;
   final String? description;
+  List<MusicalGenrer> favoriteMusicalGenrer;
+  List<MovieGenrer> favoriteMovieGenrer;
 
   final _dateFormat = DateFormat('yyyy-MM-dd');
 
-  Profile(this.userId, this.profileName, this.birthDate, this.gender,
-      this.photo, this.description);
+  Profile(
+    this.userId,
+    this.profileName,
+    this.birthDate,
+    this.gender,
+    this.photo,
+    this.description,
+    this.favoriteMusicalGenrer,
+    this.favoriteMovieGenrer,
+  );
 
   Map<String, dynamic> toMap() {
     return {

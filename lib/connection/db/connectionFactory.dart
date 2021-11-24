@@ -49,8 +49,39 @@ class ConnectionFactory {
           ) WITHOUT ROWID;''',
         );
       },
-      onUpgrade: (db, oldVersion, newVersion) async {},
-      version: 1,
+      onUpgrade: (db, oldVersion, newVersion) async {
+        await db.execute(
+          '''CREATE TABLE IF NOT EXISTS musicalGender(
+            MUSICAL_ID INTEGER NOT NULL,
+            NAME TEXT NOT NULL,
+            PRIMARY KEY(MUSICAL_ID)
+          );''',
+        );
+
+        await db.execute(
+          '''CREATE TABLE IF NOT EXISTS movieGender(
+            MOVIE_ID INTEGER NOT NULL,
+            NAME TEXT NOT NULL,
+            PRIMARY KEY(MOVIE_ID)
+          );''',
+        );
+
+        await db.execute(
+          '''CREATE TABLE IF NOT EXISTS favoriteMusicalGender(
+            USER_ID INTEGER NOT NULL,
+            MUSICAL_ID INTEGER NOT NULL,
+            PRIMARY KEY(USER_ID, MUSICAL_ID)
+          ) ;''',
+        );
+        await db.execute(
+          '''CREATE TABLE IF NOT EXISTS favoriteMovieGender(
+            USER_ID INTEGER NOT NULL,
+            MOVIE_ID INTEGER NOT NULL,
+            PRIMARY KEY(USER_ID, MOVIE_ID)
+          ) ;''',
+        );
+      },
+      version: 2,
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:app_tcc_unip/controller/dto/profileDTO.dart';
 import 'package:app_tcc_unip/ui/main/profile/editableProfile.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 class ViewProfile extends StatefulWidget {
   final ProfileDTO profile;
@@ -61,7 +62,7 @@ class _ViewProfileState extends State<ViewProfile> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      'Data nascimento ${profile.birthDateFormatted}',
+                      'Idade ${profile.age}',
                       style: TextStyle(fontSize: 16),
                     ),
                   ],
@@ -109,6 +110,66 @@ class _ViewProfileState extends State<ViewProfile> {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 20, right: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.music_note_outlined,
+                    ),
+                    Text(
+                      'Gêneros de músicais favoritos',
+                    ),
+                  ],
+                ),
+              ),
+              MultiSelectChipDisplay(
+                items: profile.favoriteMusicalGenrer
+                    .map((e) => MultiSelectItem(e.id, e.name))
+                    .toList(),
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.movie_creation_outlined,
+                    ),
+                    Text(
+                      'Gêneros de filmes favoritos',
+                    ),
+                  ],
+                ),
+              ),
+              MultiSelectChipDisplay(
+                items: profile.favoriteMovieGenrer
+                    .map((e) => MultiSelectItem(e.id, e.name))
+                    .toList(),
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 20,
+                  right: 20,
+                  bottom: 10,
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.description_outlined),
+                    Text(
+                      'Descrição',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [

@@ -1,18 +1,19 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:app_tcc_unip/controller/dto/erroFormDTO.dart';
 import 'package:app_tcc_unip/controller/dto/profileDTO.dart';
 import 'package:app_tcc_unip/controller/exception/ErroFormException.dart';
 import 'package:app_tcc_unip/controller/form/profileForm.dart';
+import 'package:app_tcc_unip/dao/movieGenrerDAO.dart';
+import 'package:app_tcc_unip/dao/musicalGenrerDAO.dart';
 import 'package:app_tcc_unip/dao/profileDAO.dart';
+import 'package:app_tcc_unip/model/movieGenrer.dart';
+import 'package:app_tcc_unip/model/musicalGenrer.dart';
 import 'package:app_tcc_unip/model/profile.dart';
 import 'package:app_tcc_unip/service/tokenService.dart';
 import 'package:app_tcc_unip/service/userService.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
-import 'package:image/image.dart';
 
 const BASE_URL_API = 'BASE_URL_API';
 
@@ -21,9 +22,67 @@ class ProfileService {
   final _userService = UserService();
   final _tokenService = TokenService();
   final _profileDAO = ProfileDAO();
+  final _musicalGenrerDAO = MusicalGenrerDAO();
+  final _movieGenrerDAO = MovieGenrerDAO();
 
   ProfileService() {
     print('criando profileService');
+  }
+
+  Future<List<MusicalGenrer>> getMusicalGenre() async {
+    var musicalGenrerList = await _musicalGenrerDAO.findAll();
+
+    if (musicalGenrerList.length > 0) {
+      return musicalGenrerList;
+    }
+
+    var token = await _tokenService.getTokenForResquest();
+    final response = await http.get(
+      Uri.parse('$baseURL/profile/musicalGenrer'),
+      headers: {
+        'Accept-Language': 'pt-BR',
+        'Authorization': token == null ? '' : token
+      },
+    );
+    if (response.statusCode == 200) {
+      Iterable it = jsonDecode(utf8.decode(response.bodyBytes));
+      musicalGenrerList = List<MusicalGenrer>.from(
+        it.map(
+          (model) => MusicalGenrer.fromJson(model),
+        ),
+      );
+      await _musicalGenrerDAO.insertOrUpdateList(musicalGenrerList);
+      return musicalGenrerList;
+    }
+    return [];
+  }
+
+  Future<List<MovieGenrer>> getMovieGenre() async {
+    List<MovieGenrer> movieGenrerList = await _movieGenrerDAO.findAll();
+
+    if (movieGenrerList.length > 0) {
+      return movieGenrerList;
+    }
+
+    var token = await _tokenService.getTokenForResquest();
+    final response = await http.get(
+      Uri.parse('$baseURL/profile/movieGenrer'),
+      headers: {
+        'Accept-Language': 'pt-BR',
+        'Authorization': token == null ? '' : token
+      },
+    );
+    if (response.statusCode == 200) {
+      Iterable it = jsonDecode(utf8.decode(response.bodyBytes));
+      movieGenrerList = List<MovieGenrer>.from(
+        it.map(
+          (model) => MovieGenrer.fromJson(model),
+        ),
+      );
+      await _movieGenrerDAO.insertOrUpdateList(movieGenrerList);
+      return movieGenrerList;
+    }
+    return [];
   }
 
   Future<ProfileDTO?> getProfileCurrentUser() async {
@@ -88,6 +147,16 @@ class ProfileService {
       'gender': profileForm.gender,
       'description': profileForm.description ?? '',
     });
+
+    for (int i = 0; i < profileForm.favoriteMusicalGenrer.length; i++) {
+      request.fields.putIfAbsent("favoriteMusicalGenre[$i]",
+          () => profileForm.favoriteMusicalGenrer[i].toString());
+    }
+
+    for (int i = 0; i < profileForm.favoriteMovieGenrer.length; i++) {
+      request.fields.putIfAbsent("favoriteMovieGenre[$i]",
+          () => profileForm.favoriteMovieGenrer[i].toString());
+    }
 
     var streamedResponse = await request.send();
 

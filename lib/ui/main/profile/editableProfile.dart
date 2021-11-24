@@ -1,15 +1,14 @@
-import 'dart:convert';
-import 'dart:ffi';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:app_tcc_unip/controller/ProfileController.dart';
 import 'package:app_tcc_unip/controller/dto/profileDTO.dart';
 import 'package:app_tcc_unip/controller/exception/ErroFormException.dart';
 import 'package:app_tcc_unip/controller/form/profileForm.dart';
+import 'package:app_tcc_unip/model/movieGenrer.dart';
+import 'package:app_tcc_unip/model/musicalGenrer.dart';
+import 'package:app_tcc_unip/service/profileService.dart';
 import 'package:app_tcc_unip/service/userService.dart';
 import 'package:app_tcc_unip/ui/components/genderSelector/gender.dart';
-import 'package:app_tcc_unip/ui/components/genderSelector/genderOption.dart';
 import 'package:app_tcc_unip/ui/components/genderSelector/genderSelector.dart';
 import 'package:app_tcc_unip/ui/util/loading.dart';
 import 'package:app_tcc_unip/ui/validator/mustFilledValidation.dart';
@@ -18,12 +17,12 @@ import 'package:app_tcc_unip/ui/validator/sizeValidation.dart';
 import 'package:app_tcc_unip/ui/validator/validation.dart';
 import 'package:app_tcc_unip/ui/validator/validationException.dart';
 import 'package:app_tcc_unip/ui/validator/validator.dart';
-import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 class EditableProfile extends StatefulWidget {
   final ProfileDTO? profile;
@@ -40,6 +39,7 @@ class EditableProfile extends StatefulWidget {
 class _EditableProfileState extends State<EditableProfile> {
   var _formProfileKey = GlobalKey<FormState>();
   var _genderSelectorKey = GlobalKey<GenderSelectorState>();
+  final _profileService = ProfileService();
 
   ProfileDTO? profile;
   final _userService = UserService();
@@ -51,6 +51,11 @@ class _EditableProfileState extends State<EditableProfile> {
   var _birthDateController = TextEditingController();
   Gender? _gender;
   var _descriptionController = TextEditingController();
+  final List<MusicalGenrer> _favoriteMusicalGenrer = [];
+  final List<MovieGenrer> _favoriteMovieGenrer = [];
+
+  List<MusicalGenrer> _musicalGenrerList = [];
+  List<MovieGenrer> _movieGenrerList = [];
 
   ImageProvider? _photoProfile;
   File? _photo;
@@ -69,6 +74,9 @@ class _EditableProfileState extends State<EditableProfile> {
             width: 120,
           ).image
         : null;
+
+    _favoriteMusicalGenrer.addAll(profile!.favoriteMusicalGenrer);
+    _favoriteMovieGenrer.addAll(profile!.favoriteMovieGenrer);
     PaintingBinding.instance!.imageCache!.clear();
   }
 
@@ -312,9 +320,160 @@ class _EditableProfileState extends State<EditableProfile> {
                           height: 10,
                         ),
                         Padding(
+                          padding: const EdgeInsets.only(left: 20, right: 20),
+                          child: GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (ctx) {
+                                  return FutureBuilder<List<MusicalGenrer>>(
+                                    future: _profileService.getMusicalGenre(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.done) {
+                                        _musicalGenrerList =
+                                            snapshot.requireData;
+                                        var itens = _musicalGenrerList
+                                            .map((mg) =>
+                                                MultiSelectItem(mg.id, mg.name))
+                                            .toList();
+                                        return MultiSelectDialog(
+                                          items: itens,
+                                          initialValue: _favoriteMusicalGenrer
+                                              .map((e) => e.id)
+                                              .toList(),
+                                          onConfirm: (selected) {
+                                            setState(() {
+                                              _favoriteMusicalGenrer.clear();
+                                              _favoriteMusicalGenrer.addAll(
+                                                  _musicalGenrerList
+                                                      .where((element) =>
+                                                          selected.contains(
+                                                              element.id))
+                                                      .toList());
+                                            });
+                                          },
+                                        );
+                                      }
+                                      return Container(
+                                        color: Colors.white,
+                                        child: SpinKitSpinningLines(
+                                          color: Colors.redAccent,
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.music_note_outlined,
+                                ),
+                                Text(
+                                  'Gêneros de músicais favoritos',
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        MultiSelectChipDisplay(
+                          items: this
+                              ._favoriteMusicalGenrer
+                              .map((e) => MultiSelectItem(e.id, e.name))
+                              .toList(),
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20, right: 20),
+                          child: GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (ctx) {
+                                  return FutureBuilder<List<MovieGenrer>>(
+                                    future: _profileService.getMovieGenre(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.done) {
+                                        _movieGenrerList = snapshot.requireData;
+                                        var itens = _movieGenrerList
+                                            .map((mg) =>
+                                                MultiSelectItem(mg.id, mg.name))
+                                            .toList();
+                                        return MultiSelectDialog(
+                                          items: itens,
+                                          initialValue: _favoriteMovieGenrer
+                                              .map((e) => e.id)
+                                              .toList(),
+                                          onConfirm: (selected) {
+                                            setState(() {
+                                              _favoriteMovieGenrer.clear();
+                                              _favoriteMovieGenrer.addAll(
+                                                  _movieGenrerList
+                                                      .where((element) =>
+                                                          selected.contains(
+                                                              element.id))
+                                                      .toList());
+                                            });
+                                          },
+                                        );
+                                      }
+                                      return Container(
+                                        color: Colors.white,
+                                        child: SpinKitSpinningLines(
+                                          color: Colors.redAccent,
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.movie_creation_outlined,
+                                ),
+                                Text(
+                                  'Gêneros de filmes favoritos',
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        MultiSelectChipDisplay(
+                          items: this
+                              ._favoriteMovieGenrer
+                              .map((e) => MultiSelectItem(e.id, e.name))
+                              .toList(),
+                        ),
+                        Padding(
                           padding: const EdgeInsets.only(
                             left: 20,
                             right: 20,
+                            bottom: 10,
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.description_outlined),
+                              Text(
+                                'Descrição',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 20,
+                            right: 20,
+                            bottom: 20,
                           ),
                           child: TextFormField(
                             textAlignVertical: TextAlignVertical.bottom,
@@ -372,6 +531,8 @@ class _EditableProfileState extends State<EditableProfile> {
               _genderSelectorKey.currentState!.genderSelect!.value,
               _photo,
               description,
+              _favoriteMusicalGenrer.map((e) => e.id).toList(),
+              _favoriteMovieGenrer.map((e) => e.id).toList(),
             );
             var loading = Loading();
             try {

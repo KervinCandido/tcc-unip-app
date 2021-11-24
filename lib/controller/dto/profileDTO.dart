@@ -1,3 +1,5 @@
+import 'package:app_tcc_unip/model/movieGenrer.dart';
+import 'package:app_tcc_unip/model/musicalGenrer.dart';
 import 'package:app_tcc_unip/model/profile.dart';
 import 'package:intl/intl.dart';
 
@@ -9,6 +11,8 @@ class ProfileDTO {
   final String gender;
   String? photo;
   final String? description;
+  List<MusicalGenrer> favoriteMusicalGenrer;
+  List<MovieGenrer> favoriteMovieGenrer;
 
   ProfileDTO({
     required this.id,
@@ -18,10 +22,23 @@ class ProfileDTO {
     required this.gender,
     this.photo,
     this.description,
+    required this.favoriteMusicalGenrer,
+    required this.favoriteMovieGenrer,
   });
 
   String get birthDateFormatted =>
       DateFormat('dd/MM/yyyy').format(this.birthDate);
+
+  int get age {
+    final today = DateTime.now();
+    if (today.year == this.birthDate.year) return 0;
+
+    var age = today.year - this.birthDate.year;
+    if (today.month > this.birthDate.month ||
+        (today.month == this.birthDate.month && today.day > this.birthDate.day))
+      age--;
+    return age;
+  }
 
   factory ProfileDTO.fromJson(Map<String, dynamic> json) {
     return ProfileDTO(
@@ -32,6 +49,16 @@ class ProfileDTO {
       gender: json['gender'],
       photo: json['photo'],
       description: json['description'],
+      favoriteMusicalGenrer: List<MusicalGenrer>.from(
+        json['favoriteMusicalGenreDTO'].map(
+          (e) => MusicalGenrer.fromJson(e),
+        ),
+      ),
+      favoriteMovieGenrer: List<MovieGenrer>.from(
+        json['favoriteMovieGenreDTO'].map(
+          (e) => MovieGenrer.fromJson(e),
+        ),
+      ),
     );
   }
 
@@ -56,6 +83,8 @@ class ProfileDTO {
       gender,
       photo,
       description,
+      favoriteMusicalGenrer,
+      favoriteMovieGenrer,
     );
   }
 
@@ -68,6 +97,8 @@ class ProfileDTO {
       gender: profile.gender,
       photo: profile.photo,
       description: profile.description,
+      favoriteMusicalGenrer: profile.favoriteMusicalGenrer,
+      favoriteMovieGenrer: profile.favoriteMovieGenrer,
     );
   }
 }
