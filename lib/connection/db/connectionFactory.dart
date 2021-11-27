@@ -48,8 +48,6 @@ class ConnectionFactory {
             PRIMARY KEY(USER_ID, USER_NAME, DATE_MESSAGE)
           ) WITHOUT ROWID;''',
         );
-      },
-      onUpgrade: (db, oldVersion, newVersion) async {
         await db.execute(
           '''CREATE TABLE IF NOT EXISTS musicalGender(
             MUSICAL_ID INTEGER NOT NULL,
@@ -81,7 +79,8 @@ class ConnectionFactory {
           ) ;''',
         );
       },
-      version: 2,
+      onUpgrade: (db, oldVersion, newVersion) async {},
+      version: 1,
     );
   }
 }

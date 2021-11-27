@@ -75,8 +75,10 @@ class _EditableProfileState extends State<EditableProfile> {
           ).image
         : null;
 
-    _favoriteMusicalGenrer.addAll(profile!.favoriteMusicalGenrer);
-    _favoriteMovieGenrer.addAll(profile!.favoriteMovieGenrer);
+    if (profile != null) {
+      _favoriteMusicalGenrer.addAll(profile!.favoriteMusicalGenrer);
+      _favoriteMovieGenrer.addAll(profile!.favoriteMovieGenrer);
+    }
     PaintingBinding.instance!.imageCache!.clear();
   }
 
