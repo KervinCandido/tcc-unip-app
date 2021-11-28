@@ -1,5 +1,7 @@
+import 'package:app_tcc_unip/connection/websocket/websocketController.dart';
 import 'package:app_tcc_unip/model/contactRecommendation.dart';
 import 'package:app_tcc_unip/model/contactWithLastMessage.dart';
+import 'package:app_tcc_unip/model/messageForm.dart';
 import 'package:app_tcc_unip/service/userService.dart';
 import 'package:app_tcc_unip/ui/main/chat/chat.dart';
 import 'package:flutter/material.dart';
@@ -13,11 +15,14 @@ class ContactItem extends StatefulWidget {
 }
 
 class _ContactItemState extends State<ContactItem> {
+  final _webSocket = WebsocketController.getInstance();
   final ContactWithLastMessage contact;
 
   final _userService = UserService();
 
-  _ContactItemState(this.contact);
+  _ContactItemState(this.contact) {
+    _webSocket.addMessageListener(onMessageReceived);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,5 +73,19 @@ class _ContactItemState extends State<ContactItem> {
         ),
       ),
     );
+  }
+
+  void onMessageReceived(MessageForm messageForm) {
+    if (messageForm.sender == this.contact.userName) {
+      setState(() {
+        this.contact.lastMessage = messageForm.content;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    this._webSocket.removeMessageListener(onMessageReceived);
+    super.dispose();
   }
 }

@@ -9,6 +9,7 @@ class Message {
 
   final _dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss SSS');
   final _dateFormatBR = DateFormat('dd/MM/yyyy HH:mm:ss');
+  final _onlyHourFormat = DateFormat('HH:mm:ss');
 
   Message(
     this.userId,
@@ -20,6 +21,7 @@ class Message {
 
   get _dateMessageFormattedDB => _dateFormat.format(dateMessage);
   get dateMessageFormattedBR => _dateFormatBR.format(dateMessage);
+  get onlyHourFormat => _onlyHourFormat.format(dateMessage);
 
   Map<String, dynamic> toMap() {
     return {

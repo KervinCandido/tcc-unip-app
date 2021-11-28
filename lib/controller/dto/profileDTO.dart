@@ -34,8 +34,8 @@ class ProfileDTO {
     if (today.year == this.birthDate.year) return 0;
 
     var age = today.year - this.birthDate.year;
-    if (today.month > this.birthDate.month ||
-        (today.month == this.birthDate.month && today.day > this.birthDate.day))
+    if (today.month < this.birthDate.month ||
+        (today.month == this.birthDate.month && today.day < this.birthDate.day))
       age--;
     return age;
   }

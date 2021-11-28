@@ -107,14 +107,28 @@ class _ChatState extends State<Chat> {
                     alignment:
                         messagemList[index].isSend ? Alignment.topRight : null,
                     margin: EdgeInsets.only(top: 10),
-                    backGroundColor: Theme.of(context).primaryColor,
+                    backGroundColor: messagemList[index].isSend
+                        ? Colors.deepPurple
+                        : Theme.of(context).primaryColor,
                     child: Container(
                       constraints: BoxConstraints(
                         maxWidth: MediaQuery.of(context).size.width * 0.7,
                       ),
-                      child: Text(
-                        messagemList[index].message,
-                        style: TextStyle(color: Colors.white),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            messagemList[index].message,
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            messagemList[index].onlyHourFormat,
+                            style: TextStyle(color: Colors.white, fontSize: 10),
+                          ),
+                        ],
                       ),
                     ),
                   );
