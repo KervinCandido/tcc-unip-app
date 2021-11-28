@@ -23,6 +23,7 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
+    PaintingBinding.instance!.imageCache!.clear();
     return FutureBuilder<ProfileDTO?>(
         future: userProfile,
         builder: (

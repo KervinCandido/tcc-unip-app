@@ -1,7 +1,6 @@
 import 'package:app_tcc_unip/controller/authController.dart';
 import 'package:app_tcc_unip/controller/form/authForm.dart';
 import 'package:app_tcc_unip/ui/main/mainScreen.dart';
-import 'package:app_tcc_unip/ui/screens/categories_screen.dart';
 import 'package:app_tcc_unip/ui/signUp/signUpScreen.dart';
 import 'package:app_tcc_unip/ui/util/loading.dart';
 import 'package:flutter/material.dart';
@@ -192,7 +191,7 @@ class _LoginFormState extends State<LoginForm> {
 
       if (autencado) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Autenticado com sucessor')),
+          SnackBar(content: Text('Autenticado com sucesso')),
         );
 
         Navigator.of(context).pushReplacement(
@@ -204,7 +203,7 @@ class _LoginFormState extends State<LoginForm> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Usuário ou senha inválidos')),
+          SnackBar(content: Text('Usuário ou senha inválido')),
         );
         _passwordController.clear();
         _passwordFocusNode.requestFocus();
