@@ -1,8 +1,6 @@
-import 'dart:io';
-
 import 'package:app_tcc_unip/connection/websocket/websocketController.dart';
 import 'package:app_tcc_unip/dao/messageDAO.dart';
-import 'package:app_tcc_unip/model/contactRecommendation.dart';
+import 'package:app_tcc_unip/model/contactWithLastMessage.dart';
 import 'package:app_tcc_unip/model/message.dart';
 import 'package:app_tcc_unip/model/messageForm.dart';
 import 'package:flutter/material.dart';
@@ -13,24 +11,28 @@ import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_1.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class Chat extends StatefulWidget {
-  final ContactRecommendation contact;
+  final ContactWithLastMessage contact;
+  final void Function(String) updateMessage;
   final int userId;
-  const Chat(this.contact, this.userId, {Key? key}) : super(key: key);
+  const Chat(this.contact, this.userId, this.updateMessage, {Key? key})
+      : super(key: key);
 
   @override
-  _ChatState createState() => _ChatState(this.contact, this.userId);
+  _ChatState createState() =>
+      _ChatState(this.contact, this.userId, this.updateMessage);
 }
 
 class _ChatState extends State<Chat> {
-  final ContactRecommendation contact;
+  final ContactWithLastMessage contact;
   final _messageDAO = MessageDAO();
+  final void Function(String) updateMessage;
   List<Message> messagemList = [];
 
   final _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final int userId;
 
-  _ChatState(this.contact, this.userId) {
+  _ChatState(this.contact, this.userId, this.updateMessage) {
     _webSocketController.addMessageListener(onMessage);
   }
 
@@ -44,6 +46,7 @@ class _ChatState extends State<Chat> {
 
   onMessage(MessageForm message) {
     setState(() {
+      this.updateMessage(message.content);
       messagemList.add(Message(
         userId,
         this.contact.userName,
@@ -181,6 +184,7 @@ class _ChatState extends State<Chat> {
   void sendMessage() {
     if (_textController.text.trim().isEmpty) return;
     setState(() {
+      this.updateMessage(_textController.text.trim());
       this.messagemList.add(
             Message(
               userId,

@@ -1,4 +1,6 @@
+import 'package:app_tcc_unip/connection/websocket/websocketController.dart';
 import 'package:app_tcc_unip/model/contactWithLastMessage.dart';
+import 'package:app_tcc_unip/model/messageForm.dart';
 import 'package:app_tcc_unip/service/contactService.dart';
 import 'package:app_tcc_unip/ui/main/contact-list/contact-item.dart';
 import 'package:flutter/material.dart';
@@ -49,5 +51,10 @@ class _ContactListState extends State<ContactList> {
             ),
           );
         });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

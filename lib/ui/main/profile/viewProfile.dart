@@ -57,33 +57,31 @@ class _ViewProfileState extends State<ViewProfile> {
               Padding(
                 padding: const EdgeInsets.only(left: 20, right: 20),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       'Idade ${profile.age}',
                       style: TextStyle(fontSize: 16),
                     ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 20, right: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Gênero',
-                      style: TextStyle(fontSize: 16),
+                    SizedBox(
+                      width: 10,
                     ),
-                    Icon(
-                      profile.gender == 'MALE'
-                          ? CommunityMaterialIcons.gender_male
-                          : CommunityMaterialIcons.gender_female,
-                      color:
-                          profile.gender == 'MALE' ? Colors.blue : Colors.red,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Gênero',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        Icon(
+                          profile.gender == 'MALE'
+                              ? CommunityMaterialIcons.gender_male
+                              : CommunityMaterialIcons.gender_female,
+                          color: profile.gender == 'MALE'
+                              ? Colors.blue
+                              : Colors.red,
+                        ),
+                      ],
                     ),
                   ],
                 ),

@@ -32,7 +32,11 @@ class _ContactItemState extends State<ContactItem> {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) {
-              return Chat(this.contact, id);
+              return Chat(this.contact, id, (content) {
+                setState(() {
+                  this.contact.lastMessage = content;
+                });
+              });
             },
           ),
         );
